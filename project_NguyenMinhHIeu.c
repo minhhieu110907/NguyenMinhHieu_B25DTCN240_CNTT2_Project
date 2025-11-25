@@ -1,21 +1,22 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<time.h>
 #define MAX 1000
-int n = 0;
+
 
 typedef struct {
 	char empId[50],name[50],position[15];
 	double baseSalary;
 	int workDay;
 }Employee;
-Employee listEmployee[MAX];
 
 typedef struct {
 	char logId[20],empId[20],date[20],status[10];
 }TimeSheet;
 
 void menu_display();
+void employeeList_display();
 void add_employee();
 int IdExisted(char empID[]);
 void employeeList_display();
@@ -24,9 +25,15 @@ void delete_employee();
 void search_by_name();
 void sort_by_baseSalary();
 int validateDate(int day, int month, int year);
+int isFutureDate(int d, int m, int y);
+int isCheckedIn(char id[], int d, int m, int y);
 void timeKeeping();
 void ViewPersonalTimeSheet();
 
+int n = 0;
+Employee listEmployee[MAX];
+TimeSheet listTimeSheet[MAX * 30];
+int logCount = 0;
 int main(){
 	int choose;
 	do {
@@ -38,23 +45,25 @@ int main(){
 		
 		switch(choose){
 			case 1: {
-				menu_display();
+				add_employee();
+				printf("\nNhan Enter de tiep tuc...");
+				getchar();
 				break;
 			}
 			case 2:{
-				add_employee();
-				printf("\nNhan Enter de tiep tuc...");
-                getchar();
-				break;
-			}
-			case 3: {
 				employee_update();
 				printf("\nNhan Enter de tiep tuc...");
                 getchar();
 				break;
 			}
-			case 4: {
+			case 3: {
 				delete_employee();
+				printf("\nNhan Enter de tiep tuc...");
+                getchar();
+				break;
+			}
+			case 4: {
+				employeeList_display();
 				printf("\nNhan Enter de tiep tuc...");
                 getchar();
 				break;
@@ -92,16 +101,17 @@ int main(){
 				getchar();
 		}
 	} while ( choose != 9);
+	return 0;
 }
 	
 void menu_display(){
 	printf("\n =============================================\n");
 	printf("||     QUAN LY NHAN VIEN VA CHAM CONG        ||");
 	printf("\n||========================================== ||\n");
-	printf("|| 1.Hien thi danh sach nhan vien            ||\n");
-	printf("|| 2.Them nhan vien moi                      ||\n");                 
-	printf("|| 3.Cap nhat ho so nhan vien                ||\n");
-	printf("|| 4.Xoa ho so nhan vien                     ||\n");
+	printf("|| 1.Them nhan vien moi                      ||\n");
+	printf("|| 2.Cap nhat ho so nhan vien                ||\n");                 
+	printf("|| 3.Xoa ho so nhan vien                     ||\n");
+	printf("|| 4.Hien thi danh sach nhan vien            ||\n");
 	printf("|| 5.Tim kiem nhan vien                      ||\n");
 	printf("|| 6.Sap xep nhan vien                       ||\n");
 	printf("|| 7.Cham cong ngay nhan vien                ||\n");
@@ -124,17 +134,19 @@ void employeeList_display (){
 		return;
 	}
 	printf("\n-----Danh sach nhan vien-----\n");
-	for ( int i =0;i<=100;i++){
-		printf("-");
+	printf("+----+------------+----------------------+---------------+------------+----------+\n");
+    printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
+    printf("+----+------------+----------------------+---------------+------------+----------+\n");
+for (int i = 0; i < n; i++) {
+    printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
+        i + 1,
+        listEmployee[i].empId,
+        listEmployee[i].name,
+        listEmployee[i].position,
+        listEmployee[i].baseSalary,
+        listEmployee[i].workDay);
 	}
-	printf("%-15s %-20s %-15s %-15s\n", "Ma Nhan Vien", "Ho Ten", "Chuc Vu", "Luong Co Ban");
-    for (int i = 0; i < n; i++) {
-        printf("%-15s %-20s %-15s %-15.2lf\n", 
-               listEmployee[i].empId, 
-               listEmployee[i].name, 
-               listEmployee[i].position, 
-               listEmployee[i].baseSalary);
-    }
+	printf("+----+------------+----------------------+---------------+------------+----------+\n");
 }
 
 void add_employee(){
@@ -155,7 +167,7 @@ void add_employee(){
 		if ( IdExisted(e.empId) != -1){
 			printf("Ma nhan vien da ton tai trong danh sach\n");
 		}
-	} while ( strcmp (e.empId,"") == 0 ||  (e.empId) == 1 );
+	} while ( strcmp (e.empId,"") == 0 || IdExisted(e.empId) != -1 );
 	
 	do {
 		printf("Nhap ten nhan vien: ");
@@ -169,7 +181,7 @@ void add_employee(){
 	
 	do {
 		printf("Nhap chuc vu nhan vien: ");
-		fgets(e.position,50,stdin);
+		fgets(e.position,15,stdin);
 		e.position[strcspn(e.position,"\n")]='\0';
 		
 		if (strcmp (e.position,"") == 0 ){
@@ -218,7 +230,7 @@ void employee_update(){
     
     do {
         printf("Nhap chuc vu: ");
-        fgets(e.position,50,stdin);
+        fgets(e.position,15,stdin);
         e.position[strcspn(e.position,"\n")]='\0';
     } while (strcmp(e.position,"") == 0); 
     
@@ -338,7 +350,7 @@ int validateDate(int day, int month, int year){
 		}else{
 			if(day<1 || day>28){
 				success = 0;
-				printf("\nNgay sinh khong hop le!");
+				printf("\nNgay cham cong khong hop le!");
 			}
 		}
 		
@@ -347,87 +359,149 @@ int validateDate(int day, int month, int year){
 		success = 0;
 		printf("\nThang cham cong khong hop le!");
 	}
-	if(year<1900 || year>2025){
+	if(year<1900 || year>2100){
 		success = 0;
 		printf("\nNam cham cong khong hop le");
 	}
 	return success;
 }
+int isFutureDate(int d, int m, int y) {
+	time_t t = time(NULL);
+    struct tm current = *localtime(&t);
 
-void timeKeeping(){
-	Employee e;
-	char InputId[50];
-	int index = -1;
-	
-	do {
-	printf("Nhap ma nhan vien can cham cong: ");
-	fgets(InputId,50,stdin);
-	InputId[strcspn(InputId,"\n")]='\0';
-	index = IdExisted( InputId);
-	if (index == -1 ){
-		printf("Khong co nhan vien trong danh sach.Vui long nhap lai\n");
+    int curDay = current.tm_mday;
+    int curMonth = current.tm_mon + 1;
+    int curYear = current.tm_year + 1900;
+
+    if (y > curYear) {
+	    return 1;
+    }
+    if (y == curYear && m > curMonth){
+	    return 1;
+    }
+    if (y == curYear && m == curMonth && d > curDay) {
+    	return 1;
 	}
-	} while( index == -1);
-	printf("\n=== THONG TIN NHAN VIEN ===\n");
+
+    return 0; 
+}
+
+int isCheckedIn(char id[], int d, int m, int y) {
+    char dateToCheck[20];
+    sprintf(dateToCheck, "%02d/%02d/%d", d, m, y); 
+
+    for (int i = 0; i < logCount; i++) {
+        if (strcmp(listTimeSheet[i].empId, id) == 0 && strcmp(listTimeSheet[i].date, dateToCheck) == 0) {
+            return 1; 
+        }
+    }
+    return 0;
+}
+
+void timeKeeping() {
+    char InputId[50];
+    int index = -1;
+  
+    do {
+        printf("Nhap ma nhan vien can cham cong: ");
+        fgets(InputId, 50, stdin);
+        InputId[strcspn(InputId, "\n")] = '\0';
+        index = IdExisted(InputId);
+        if (index == -1) {
+            printf("Khong co nhan vien trong danh sach. Vui long nhap lai.\n");
+        }
+    } while (index == -1);
+
+    printf("\n=== THONG TIN NHAN VIEN ===\n");
     printf("Ma nhan vien: %s\n", listEmployee[index].empId);
     printf("Ho ten: %s\n", listEmployee[index].name);
     printf("Chuc vu: %s\n", listEmployee[index].position);
     printf("==========================\n");
 
-	int d,m,y;
-	do {
-	printf("Moi nhap ngay cham cong ( dinh dang dd/mm/yyyy): ");
-	if(scanf("%d/%d/%d",&d,&m,&y) != 3){
-		printf("Sai dinh dang.Moi ban nhap lai\n");
-		getchar();
-		continue;	
-	} 
-	getchar();
-	} while (validateDate(d, m, y) == 0); 
-
-    listEmployee[index].workDay++; 
-    
-    printf("\n Cham cong THANH CONG ngay %02d/%02d/%d!\n", d, m, y);
-    printf(" Tong so ngay cong moi: %d\n", listEmployee[index].workDay);
-    getchar();
-}
-
-void ViewPersonalTimeSheet(){
-	int index = -1;
-	char viewEmpId[50];
-	do {
-	printf("Moi ban nhap ID muon tim kiem thong tin cham cong: ");
-	fgets(viewEmpId,50,stdin);
-	viewEmpId[strcspn(viewEmpId,"\n")]='\0';
-	index = IdExisted(viewEmpId);
-	if(index == -1 ){
-		printf("Khong tim thay thong tin nhan vien");
-	}
-	} while (index == -1);
-        int workdayCount = listEmployee[index].workDay;
-        double result = 0;
-
-        printf("\n============================================\n");
-        printf("||        BANG CHAM CONG CA NHAN          ||\n");
-        printf("============================================\n");
-        printf(" Ma NV       : %s\n", listEmployee[index].empId);
-        printf(" Ho va Ten   : %s\n", listEmployee[index].name);
-        printf(" Chuc vu     : %s\n", listEmployee[index].position);
-        printf(" Luong Co Ban: %.2lf VND\n", listEmployee[index].baseSalary);
-        printf("--------------------------------------------\n");
-        printf(" Tong so ngay cong tich luy : %d ngay\n", workdayCount);
-
-        if (workdayCount == 0) {
-            printf("Nhan vien chua di lam ngay nao.\n");
-            result = 0; 
-        } else {
-            result = listEmployee[index].baseSalary / workdayCount;
-            printf(" Ket qua (Luong Co ban / Ngay cong): %.2lf VND\n", result);
+    int d, m, y;
+    do {
+        printf("Moi nhap ngay cham cong (dd/mm/yyyy): ");
+        if (scanf("%d/%d/%d", &d, &m, &y) != 3) {
+            printf("Sai dinh dang. Moi ban nhap lai.\n");
+            while(getchar() != '\n');
+            continue;
         }
-        
-        printf("============================================\n");
+        getchar();
+    } while (validateDate(d, m, y) == 0);
+    if (isFutureDate(d, m, y)) {
+        printf("[LOI] Ngay cham cong khong duoc nam trong tuong lai!\n");
+        return;
     }
 
+    if (isCheckedIn(InputId, d, m, y) == 1) {
+        return;
+    }
+
+    strcpy(listTimeSheet[logCount].empId, InputId);
+    
+    sprintf(listTimeSheet[logCount].date, "%02d/%02d/%d", d, m, y); 
+    
+    strcpy(listTimeSheet[logCount].status, "Di lam");
+    logCount++; 
+    
+    listEmployee[index].workDay++; 
+    printf("\n Cham cong THANH CONG ngay %02d/%02d/%d!\n", d, m, y);
+
+}
+
+void ViewPersonalTimeSheet() {
+    char inputId[50];
+    int index = -1;
+
+    do {
+        printf("Nhap ID nhan vien muon xem bang cong: ");
+        fgets(inputId, 50, stdin);
+        inputId[strcspn(inputId, "\n")] = '\0';
+        index = IdExisted(inputId);
+        if (index == -1) {
+            printf("Khong tim thay nhan vien. Vui long nhap lai.\n");
+        }
+    } while (index == -1);
+
+    printf("\n");
+    printf("============================================\n");
+    printf("          BANG CHAM CONG CA NHAN           \n");
+    printf("============================================\n");
+    printf(" Ma NV     : %s\n", listEmployee[index].empId);
+    printf(" Ho va Ten : %s\n", listEmployee[index].name);
+    printf(" Chuc vu   : %s\n", listEmployee[index].position);
+    printf("============================================\n");
+
+    printf("| %-20s | %-15s |\n", "NGAY THANG", "TRANG THAI");
+    printf("|----------------------|-----------------|\n");
+
+    int count = 0; 
+    int foundLog = 0;
+
+    for (int i = 0; i < logCount; i++) {
+        if (strcmp(listTimeSheet[i].empId, inputId) == 0) {
+            
+            printf("| %-20s | %-15s |\n", 
+                   listTimeSheet[i].date,    
+                   listTimeSheet[i].status); 
+            
+            count++;
+            foundLog = 1;
+        }
+    }
+
+    if (foundLog == 0) {
+        printf("|        Chua co du lieu cham cong       |\n");
+    }
+
+    printf("--------------------------------------------\n");
+    
+    printf(" TONG SO NGAY ÐA CHAM CONG: %d ngay\n", count);
+    printf("============================================\n");
+    
+    printf("\nNhan Enter de quay lai...");
+    getchar();
+}
 	
 
 
