@@ -150,6 +150,7 @@ for (int i = 0; i < n; i++) {
 }
 
 void add_employee(){
+	int choice;
 	Employee e;
 	e.workDay = 0 ;
 	if ( n >= MAX){
@@ -199,6 +200,28 @@ void add_employee(){
 		}
 	} while ( e.baseSalary <= 0);
 	
+	do {
+		printf("Ngay cong ( 1. Bang 0 2.Nhap vao tu ban phim): ");
+		scanf("%d",&choice);
+		getchar();
+		if ( choice != 1 && choice != 2){
+			printf("Lua chon cua ban khong hop le.Vui long thu lai\n");
+		}
+	} while ( choice != 1 && choice != 2);
+	
+	if ( choice == 1){
+		e.workDay = 0;
+		printf(" Workday = 0");
+	}
+	if ( choice == 2){
+		do {
+		printf("Moi ban nhap vao so ngay cong: ");
+		if (scanf("%d", &e.workDay) <= 0){
+			printf("Ngay cong khong hop le.Vui long nhap lai.\n");
+		}
+	    } while ( e.workDay <= 0);
+	}
+	
 	listEmployee[n] = e;
     n++;
     printf("Them nhan vien thanh cong!\n");
@@ -239,6 +262,13 @@ void employee_update(){
         scanf("%lf",&e.baseSalary);
         getchar();
     } while (e.baseSalary <= 0);    
+    
+    do {
+    	printf("Moi ban nhap vao so ngay cong: ");
+		if (scanf("%d", &e.workDay) <= 0){
+			printf("Ngay cong khong hop le.Vui long nhap lai.\n");
+		}
+	    } while ( e.workDay <= 0);
     
     listEmployee[targetIndex] = e;
     printf("Cap nhat ho so nhan vien thanh cong!\n");
