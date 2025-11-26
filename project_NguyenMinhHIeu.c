@@ -17,6 +17,7 @@ typedef struct {
 
 void menu_display();
 void employeeList_display();
+void addSampleList();
 void add_employee();
 int IdExisted(char empID[]);
 void employeeList_display();
@@ -36,6 +37,7 @@ TimeSheet listTimeSheet[MAX * 30];
 int logCount = 0;
 int main(){
 	int choose;
+	addSampleList();
 	do {
 		system("cls");
 		menu_display();
@@ -103,21 +105,30 @@ int main(){
 	} while ( choose != 9);
 	return 0;
 }
+void addSampleList() {  
+Employee e1 = {"ID01", "Tran Minh Duc", "Quan li", 2000, 5};
+Employee e2 = {"ID02", "Phung Duy Dat", "Nhan vien", 1000, 3};
+Employee e3 = {"ID03", "Nguyen Minh Hieu", "Chu tich", 20000, 8};
+Employee e4 = {"ID04", "Tang Hieu Thanh", "Lao cong", 10000 , 11};
+listEmployee[n++] = e1;
+listEmployee[n++] = e2;
+listEmployee[n++] = e3;
+listEmployee[n++] = e4;
+}
 	
 void menu_display(){
-	printf("\n =============================================\n");
-	printf("||     QUAN LY NHAN VIEN VA CHAM CONG        ||");
-	printf("\n||========================================== ||\n");
-	printf("|| 1.Them nhan vien moi                      ||\n");
-	printf("|| 2.Cap nhat ho so nhan vien                ||\n");                 
-	printf("|| 3.Xoa ho so nhan vien                     ||\n");
-	printf("|| 4.Hien thi danh sach nhan vien            ||\n");
-	printf("|| 5.Tim kiem nhan vien                      ||\n");
-	printf("|| 6.Sap xep nhan vien                       ||\n");
-	printf("|| 7.Cham cong ngay nhan vien                ||\n");
-	printf("|| 8.Xem bang cong nhan vien                 ||\n");
-	printf("|| 9.Thoat                                   ||\n");
-	printf(" =============================================\n");
+	
+	printf("\n+----------Danh sach quan ly nhan vien va cham cong--------+\n");
+    printf("|1. Them moi nhan vien                                     |\n");
+    printf("|2. Cap nhat ho so nhan vien                               |\n");
+    printf("|3. Sa thai / nghi viec                                    |\n");
+    printf("|4. Hien thi danh sach nhan vien                           |\n");
+    printf("|5. Tra cuu thong tin nhan vien                            |\n");
+    printf("|6. Sap xep danh sach nhan vien theo luong co ban          |\n");
+    printf("|7. Cham ngay cong                                         |\n");
+    printf("|8. Xem bang cong                                          |\n");
+    printf("|9. Thoat                                                  |\n");
+    printf("+----------------------------------------------------------+\n");
 }
 int IdExisted(char empId[]){
 	for(int i=0;i<n;i++){
@@ -133,11 +144,39 @@ void employeeList_display (){
 		printf("Khong co nhan vien nao\n");
 		return;
 	}
+    int perPage = 2;  
+    int totalPage = (n + perPage - 1) / perPage;
+    int page;
+
+    printf("Danh sach co %d trang.\n", totalPage);
+
+    while (1) {
+        printf("Nhap trang muon xem (1 - %d): ", totalPage);
+        if (scanf("%d", &page) != 1) {
+            printf("Dinh dang khong hop le. Vui long nhap 1 so nguyen.\n"); //nhap khong phai so thi bao loi 
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n'); // clear buffer
+
+        if (page < 1 || page > totalPage) {
+            printf("So trang khong hop le! Vui long nhap lai.\n");
+            continue;
+        }
+        break; 
+    }
+
+    // Tinh vi tri bat dau – ket thúc
+    int start = (page - 1) * perPage;
+    int end = start + perPage;
+    if (end > n) end = n;
+
+    printf("\n=== TRANG %d / %d ===\n", page, totalPage);
 	printf("\n-----Danh sach nhan vien-----\n");
 	printf("+----+------------+----------------------+---------------+------------+----------+\n");
     printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
     printf("+----+------------+----------------------+---------------+------------+----------+\n");
-for (int i = 0; i < n; i++) {
+for (int i = start; i < end; i++) {
     printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
         i + 1,
         listEmployee[i].empId,
@@ -152,7 +191,8 @@ for (int i = 0; i < n; i++) {
 void add_employee(){
 	int choice;
 	Employee e;
-	e.workDay = 0 ;
+	char input [100];
+	char salaryinput[100];
 	if ( n >= MAX){
 		printf("Danh sach da day.Khong the them\n");
 		return;
@@ -190,47 +230,90 @@ void add_employee(){
 		}
 	} while ( strcmp (e.position,"") == 0 );
 	
-	do {
-		printf("Nhap luong co ban: ");
-		scanf("%lf",&e.baseSalary);
-		getchar();
-		
-		if (e.baseSalary <= 0 ){
-			printf(" Muc luong nhap khong phu hop\n");
-		}
-	} while ( e.baseSalary <= 0);
-	
-	do {
-		printf("Ngay cong ( 1. Bang 0 2.Nhap vao tu ban phim): ");
-		scanf("%d",&choice);
-		getchar();
-		if ( choice != 1 && choice != 2){
-			printf("Lua chon cua ban khong hop le.Vui long thu lai\n");
-		}
-	} while ( choice != 1 && choice != 2);
-	
-	if ( choice == 1){
-		e.workDay = 0;
-		printf(" Workday = 0");
-	}
-	if ( choice == 2){
-		do {
-		printf("Moi ban nhap vao so ngay cong: ");
-		if (scanf("%d", &e.workDay) <= 0){
-			printf("Ngay cong khong hop le.Vui long nhap lai.\n");
-		}
-	    } while ( e.workDay <= 0);
-	}
+	double baseSalary;
+
+
+    do {
+    printf("Nhap luong co ban: ");
+
+    fgets(salaryinput, sizeof(salaryinput), stdin);
+    salaryinput[strcspn(salaryinput, "\n")] = '\0'; // Xoa ky tu enter
+
+    // Kiem tra trong
+    if (strlen(salaryinput) == 0) {
+        printf("Khong duoc de trong! Vui long nhap lai.\n");
+        continue;
+    }
+
+    // Kiem tra dinh dang
+    if (sscanf(salaryinput, "%lf", &baseSalary) != 1) {
+        printf("Luong phai la so! Vui long nhap lai.\n");
+        continue;
+    }
+
+    // Kiem tra so duong
+    if (baseSalary <= 0) {
+        printf("Luong phai la so duong! Vui long nhap lai.\n");
+        continue;
+    }
+    break; 
+
+    } while (1);
+
+    do {
+    printf("Ngay cong (1. Bang 0  2. Nhap tu ban phim): ");
+    fgets(salaryinput, sizeof(salaryinput), stdin);
+    salaryinput[strcspn(salaryinput, "\n")] = '\0';
+
+    if (strlen(salaryinput) == 0) {
+        printf("Khong duoc de trong! Vui long nhap lai.\n");
+        continue;
+    }
+
+    if (sscanf(salaryinput, "%d", &choice) != 1 || (choice != 1 && choice != 2)) {
+        printf("Lua chon khong hop le! Vui long nhap 1 hoac 2.\n");
+        continue;
+    }
+    break;
+    } while (1);
+    
+    if (choice == 1) {
+    e.workDay = 0;
+    printf("Workday = 0\n");
+    }  
+    if (choice == 2) {
+    char buf[50];
+    do {
+        printf("Moi ban nhap vao so ngay cong: ");
+        fgets(buf, sizeof(buf), stdin);
+        buf[strcspn(buf, "\n")] = '\0';
+
+        if (strlen(buf) == 0) {
+            printf("Khong duoc de trong!\n");
+            continue;
+        }
+
+        if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0) {
+            printf("Ngay cong phai la so nguyen duong!\n");
+            continue;
+        }
+
+        break;
+    } while (1);
+}
 	
 	listEmployee[n] = e;
     n++;
-    printf("Them nhan vien thanh cong!\n");
+    printf("\nThem nhan vien thanh cong!\n");
 }
 	
 void employee_update(){
     Employee e;
     int targetIndex = -1;
     char targetId[50];
+    double baseSalary;
+    char salaryinput [100];
+    char input [100];
     
     printf("Nhap ma nhan vien can cap nhat: ");
     fgets(targetId,50,stdin);
@@ -245,11 +328,6 @@ void employee_update(){
     e = listEmployee[targetIndex];
     printf("-----DANG CAP NHAT THONG TIN CHO ID: %s -----\n", e.empId);
 
-    do {
-        printf("Nhap ten nhan vien: ");
-        fgets(e.name,50,stdin);
-        e.name[strcspn(e.name,"\n")]='\0';
-    } while (strcmp(e.name,"") == 0); 
     
     do {
         printf("Nhap chuc vu: ");
@@ -258,20 +336,53 @@ void employee_update(){
     } while (strcmp(e.position,"") == 0); 
     
     do {
-        printf("Nhap luong co ban: ");
-        scanf("%lf",&e.baseSalary);
-        getchar();
-    } while (e.baseSalary <= 0);    
+    printf("Nhap luong co ban: ");
+
+    fgets(salaryinput, sizeof(salaryinput), stdin);
+    salaryinput[strcspn(salaryinput, "\n")] = '\0'; // Xoa ky tu enter
+
+    // Kiem tra trong
+    if (strlen(salaryinput) == 0) {
+        printf("Khong duoc de trong! Vui long nhap lai.\n");
+        continue;
+    }
+
+    // Kiem tra dinh dang
+    if (sscanf(salaryinput, "%lf", &baseSalary) != 1) {
+        printf("Luong phai la so! Vui long nhap lai.\n");
+        continue;
+    }
+
+    // Kiem tra so duong
+    if (baseSalary <= 0) {
+        printf("Luong phai la so duong! Vui long nhap lai.\n");
+        continue;
+    }
+    break; 
+
+    } while (1); 
     
+    char buf[50];
     do {
-    	printf("Moi ban nhap vao so ngay cong: ");
-		if (scanf("%d", &e.workDay) <= 0){
-			printf("Ngay cong khong hop le.Vui long nhap lai.\n");
-		}
-	    } while ( e.workDay <= 0);
+        printf("Moi ban nhap vao so ngay cong: ");
+        fgets(buf, sizeof(buf), stdin);
+        buf[strcspn(buf, "\n")] = '\0';
+
+        if (strlen(buf) == 0) {
+            printf("Khong duoc de trong!\n");
+            continue;
+        }
+
+        if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0) {
+            printf("Ngay cong phai la so nguyen duong!\n");
+            continue;
+        }
+
+        break;
+    } while (1);
     
     listEmployee[targetIndex] = e;
-    printf("Cap nhat ho so nhan vien thanh cong!\n");
+    printf("\nCap nhat ho so nhan vien thanh cong!\n");
 }
 
 void delete_employee(){
