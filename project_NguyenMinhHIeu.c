@@ -473,6 +473,7 @@ void search_by_name(){
 		printf("\nKhong tim thay nhan vien!");
 	}
 }
+
 void sort_by_baseSalary(){
 	Employee e;
 	if(n == 0 ){
@@ -563,6 +564,7 @@ int validateDate(int day, int month, int year){
 	}
 	return success;
 }
+
 int isFutureDate(int d, int m, int y) {
 	time_t t = time(NULL);
     struct tm current = *localtime(&t);
@@ -703,6 +705,7 @@ void ViewPersonalTimeSheet() {
     printf("\nNhan Enter de quay lai...");
     getchar();
 }
+
 void loadingBar(int length, int color) {
     system("cls");
     printf("Dang tai du lieu...\n\n");
