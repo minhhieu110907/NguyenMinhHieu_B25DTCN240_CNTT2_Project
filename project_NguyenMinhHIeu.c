@@ -110,15 +110,45 @@ int main(){
 	} while ( choose != 9);
 	return 0;
 }
+
 void addSampleList() {  
-Employee e1 = {"ID01", "Tran Minh Duc", "Quan li", 2000, 5};
-Employee e2 = {"ID02", "Phung Duy Dat", "Nhan vien", 1000, 3};
-Employee e3 = {"ID03", "Nguyen Minh Hieu", "Chu tich", 20000, 8};
-Employee e4 = {"ID04", "Tang Hieu Thanh", "Lao cong", 10000 , 11};
-listEmployee[n++] = e1;
-listEmployee[n++] = e2;
-listEmployee[n++] = e3;
-listEmployee[n++] = e4;
+    Employee e1 = {"ID01", "Tran Minh Duc", "Quan li", 2000, 5};
+    Employee e2 = {"ID02", "Phung Duy Dat", "Nhan vien", 1000, 3};
+    Employee e3 = {"ID03", "Nguyen Minh Hieu", "Chu tich", 20000, 8};
+    Employee e4 = {"ID04", "Tang Hieu Thanh", "Lao cong", 10000 , 11};
+    
+    listEmployee[n++] = e1;
+    listEmployee[n++] = e2;
+    listEmployee[n++] = e3;
+    listEmployee[n++] = e4;
+
+    // 2. Tu dong tao du lieu Cham cong (Mix giua Di lam va Nghi lam)
+    for (int i = 0; i < n; i++) {
+        // Giai doan 1: Tao ngay DI LAM (dua theo workDay cua tung nguoi)
+        for (int j = 1; j <= listEmployee[i].workDay; j++) {
+            strcpy(listTimeSheet[logCount].empId, listEmployee[i].empId);
+            strcpy(listTimeSheet[logCount].status, "Di lam");
+            
+            // Tao ngay di lam: Ngay 1, 2, 3... thang 11
+            sprintf(listTimeSheet[logCount].date, "%02d/%02d/%d", j, 11, 2025);
+            logCount++;
+        }
+
+        // --- Giai doan 2: Tao them ngay NGHI LAM (Bonus them cho sinh dong) ---
+        // Chi tao them ngay nghi cho 2 nhan vien dau tien de thay su khac biet
+        if (i < 2) { 
+            // Nhan vien nay se co them 2 ngay nghi sau chuoi ngay di lam
+            for (int k = 1; k <= 2; k++) {
+                strcpy(listTimeSheet[logCount].empId, listEmployee[i].empId);
+                strcpy(listTimeSheet[logCount].status, "Nghi lam"); 
+                
+                // Ngay nghi la ngay tiep theo sau nhung ngay di lam
+                // Vi du: workDay = 5 -> Nghi ngay 6 va 7
+                sprintf(listTimeSheet[logCount].date, "%02d/%02d/%d", listEmployee[i].workDay + k, 11, 2025);
+                logCount++;
+            }
+        }
+    }
 }
 	
 void menu_display(){
@@ -163,11 +193,11 @@ void employeeList_display (){
         printf("Nhap trang muon xem (1 - %d): ", totalPage);
         if (scanf("%d", &page) != 1) {
         	setColor(31);
-            printf("Dinh dang khong hop le. Vui long nhap 1 so nguyen.\n"); //nhap khong phai so thi bao loi 
+            printf("Dinh dang khong hop le. Vui long nhap 1 so nguyen.\n"); 
             while (getchar() != '\n');
             continue;
         }
-        while (getchar() != '\n'); // clear buffer
+        while (getchar() != '\n'); 
 
         if (page < 1 || page > totalPage) {
         	setColor(31);
@@ -229,7 +259,6 @@ void add_employee(){
         e.empId[strcspn(e.empId, "\n")] = '\0';
         
         trimString(e.empId);
-        
         if (strcmp(e.empId, "") == 0) {
             setColor(31);
             printf("Ma nhan vien khong duoc de trong\n");
@@ -238,18 +267,16 @@ void add_employee(){
         
         int isSpecial = 0;
         for (int i = 0; i < strlen(e.empId); i++) {
-            if (!isalnum(e.empId[i])) { // N?u phát hi?n ký t? KHÔNG ph?i ch?/s?
+            if (!isalnum(e.empId[i])) { 
                 isSpecial = 1;
                 break;
             }
         }
-        
         if (isSpecial) {
             setColor(31);
             printf("Ma nhan vien khong duoc chua ky tu dac biet hoac khoang trang o giua!\n");
             continue;
         }
-
         if (IdExisted(e.empId) != -1) {
             setColor(31);
             printf("Ma nhan vien da ton tai\n");
@@ -257,7 +284,6 @@ void add_employee(){
         }
         
         break;
-
     } while (1);
 	do {
 		printf("Nhap ten nhan vien: ");
@@ -371,20 +397,45 @@ void employee_update(){
     char targetId[50];
     double baseSalary;
     char salaryinput [100];
-    char input [100];
-    
-    printf("Nhap ma nhan vien can cap nhat: ");
-    fgets(targetId,50,stdin);
-    targetId[strcspn(targetId,"\n")]='\0';
-    targetIndex = IdExisted(targetId);
-    
-    if (targetIndex == -1){
-    	loadingBar(50, 32);
-    	setColor(31);
-        printf("\nKhong tim thay nhan vien co ma [%s]\n",targetId);
-        return;
-    }
-    
+    do {
+        printf("Nhap ma nhan vien can update: ");
+        fgets(targetId, 50, stdin);
+        targetId[strcspn(targetId, "\n")] = '\0';
+        
+        trimString(targetId);
+        
+        // Kiem tra rong
+        if (strcmp(targetId, "") == 0) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc de trong\n");
+            continue; 
+        }
+        
+        // Kiem tra ky tu dac biet
+        int isSpecial = 0;
+        for (int i = 0; i < strlen(targetId); i++) {
+            if (!isalnum(targetId[i])) { 
+                isSpecial = 1;
+                break;
+            }
+        }
+        if (isSpecial) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc chua ky tu dac biet!\n");
+            continue;
+        }
+        
+        // Kiem tra ton tai
+        targetIndex = IdExisted(targetId);
+        if (targetIndex == -1){
+            loadingBar(50, 32);
+            setColor(31);
+            printf("\nKhong tim thay nhan vien co ma [%s]. Vui long nhap lai.\n", targetId);
+            continue; 
+        }
+        break; 
+    } while (1);
+  
     e = listEmployee[targetIndex];
     printf("-----DANG CAP NHAT THONG TIN CHO ID: %s -----\n", e.empId);
 
@@ -453,24 +504,62 @@ void employee_update(){
 
 void delete_employee(){
     char deleteId[50]; 
-    printf("Nhap ma nhan vien can xoa: ");
-    fgets(deleteId,50,stdin);
-    deleteId[strcspn(deleteId,"\n")]='\0';
+    char confirm;
+    int index = -1;
     
+    	do {
+        printf("Nhap ma nhan vien: ");
+        fgets(deleteId, 50, stdin);
+        deleteId[strcspn(deleteId, "\n")] = '\0';
+        
+        trimString(deleteId);
+        if (strcmp(deleteId, "") == 0) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc de trong\n");
+            continue; 
+        }
+        
+        int isSpecial = 0;
+        for (int i = 0; i < strlen(deleteId); i++) {
+            if (!isalnum(deleteId[i])) { 
+                isSpecial = 1;
+                break;
+            }
+        }
+        if (isSpecial) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc chua ky tu dac biet hoac khoang trang o giua!\n");
+            continue;
+        }
+        break;
+    } while (1);
     
-    int index = IdExisted(deleteId);
+    printf("\n========================================");
+    printf("\n   XAC NHAN XOA NHAN VIEN");
+    printf("\n========================================");
+    printf("\n Ma NV     : %s", listEmployee[index].empId);
+    printf("\n Ho va Ten : %s", listEmployee[index].name);
+    printf("\n Chuc vu   : %s", listEmployee[index].position);
+    printf("\n========================================");
     
-    if(index == -1){
-    	setColor(31);
-        printf("\nKhong tim thay nhan vien co ma [%s]",deleteId);
-    } else {
+    setColor(31); 
+    printf("\nCANH BAO: Hanh dong nay khong the hoan tac!");
+    setColor(0);  
+    printf("\nBan co chac chan muon xoa nhan vien nay? (Y/N): ");
+    
+    scanf("%c", &confirm);
+    while(getchar() != '\n'); 
+    
+    if (confirm == 'y' || confirm == 'Y') {
         for(int j = index; j < n - 1; j++){
             listEmployee[j] = listEmployee[j+1];
         }
-        n--;
-        clearScreen();
+        n--; 
+        loadingBar(50, 33); 
         setColor(32);
-        printf("\nXoa nhan vien ma: [%s] thanh cong\n", deleteId);
+        printf("\n[Thanh cong] Da xoa nhan vien ma: %s\n", deleteId);
+    } else {
+        printf("\nDa huy thao tac xoa!\n");
     }
 }
 
@@ -620,7 +709,7 @@ int isCheckedIn(char id[], int d, int m, int y) {
     return 0;
 }
 
-void timeKeeping() {
+void timeKeeping() { 
     char InputId[50];
     int index = -1;
   
@@ -628,89 +717,172 @@ void timeKeeping() {
         printf("Nhap ma nhan vien can cham cong: ");
         fgets(InputId, 50, stdin);
         InputId[strcspn(InputId, "\n")] = '\0';
+        
+        trimString(InputId);
+        
+        if (strcmp(InputId, "") == 0) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc de trong! Vui long nhap lai.\n");
+            setColor(0); 
+            continue;
+        }
+
+        int isSpecial = 0;
+        for (int i = 0; i < strlen(InputId); i++) {
+            if (!isalnum(InputId[i])) { 
+                isSpecial = 1;
+                break;
+            }
+        }
+        if (isSpecial) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc chua ky tu dac biet!\n");
+            setColor(0); 
+            continue;
+        }
+
         index = IdExisted(InputId);
         if (index == -1) {
-        	loadingBar(50, 31);
-            printf("\nKhong co nhan vien trong danh sach. Vui long nhap lai.\n");
+            loadingBar(50, 31);
+            setColor(31);
+            printf("\nKhong tim thay nhan vien co ma [%s]. Vui long nhap lai.\n", InputId);
+            setColor(0); 
         }
     } while (index == -1);
 
     printf("\n=== THONG TIN NHAN VIEN ===\n");
     printf("Ma nhan vien: %s\n", listEmployee[index].empId);
     printf("Ho ten: %s\n", listEmployee[index].name);
-    printf("Chuc vu: %s\n", listEmployee[index].position);
     printf("==========================\n");
 
     int d, m, y;
     do {
-        printf("Moi nhap ngay cham cong (dd/mm/yyyy): ");
+        printf("Moi nhap ngay (dd/mm/yyyy): ");
         if (scanf("%d/%d/%d", &d, &m, &y) != 3) {
-        	loadingBar(50, 31);
+            loadingBar(50, 31);
             printf("\n Sai dinh dang. Moi ban nhap lai.\n");
             while(getchar() != '\n');
             continue;
         }
-        getchar();
+        getchar(); 
     } while (validateDate(d, m, y) == 0);
+
     if (isFutureDate(d, m, y)) {
-    	loadingBar(50, 32);
+        loadingBar(50, 32);
         printf("\n[LOI] Ngay cham cong khong duoc nam trong tuong lai!\n");
         return;
     }
 
     if (isCheckedIn(InputId, d, m, y) == 1) {
+        setColor(31);
+        printf("\n[LOI] Ngay nay da co du lieu cham cong roi!\n");
+        setColor(0);
         return;
     }
 
-    strcpy(listTimeSheet[logCount].empId, InputId);
-    sprintf(listTimeSheet[logCount].date, "%02d/%02d/%d", d, m, y); 
-    strcpy(listTimeSheet[logCount].status, "Di lam");
-    logCount++; 
-    listEmployee[index].workDay++; 
-    loadingBar(50, 32);
-    printf("\n Cham cong THANH CONG ngay %02d/%02d/%d!\n", d, m, y);
+    int type;
+    do {
+        printf("\nChon loai cham cong:\n");
+        printf("1. Di lam (Tinh cong)\n");
+        printf("2. Nghi lam (Khong tinh cong / Nghi phep)\n");
+        printf("Lua chon cua ban: ");
+        scanf("%d", &type);
+        getchar();
+        if (type != 1 && type != 2) {
+            printf("Lua chon khong hop le!\n");
+        }
+    } while (type != 1 && type != 2);
 
+    strcpy(listTimeSheet[logCount].empId, InputId);
+    sprintf(listTimeSheet[logCount].date, "%02d/%02d/%d", d, m, y);
+    
+    if (type == 1) {
+        strcpy(listTimeSheet[logCount].status, "Di lam");
+        listEmployee[index].workDay++; 
+    } else {
+        strcpy(listTimeSheet[logCount].status, "Nghi lam");
+    }
+
+    logCount++; 
+    loadingBar(50, 32);
+    
+    if (type == 1)
+        printf("\n Cham cong DI LAM thanh cong ngay %02d/%02d/%d!\n", d, m, y);
+    else
+        printf("\n Ghi nhan NGHI LAM thanh cong ngay %02d/%02d/%d!\n", d, m, y);
 }
 
 void ViewPersonalTimeSheet() {
-    char inputId[50];
+    char InputId[50];
     int index = -1;
 
     do {
-        printf("Nhap ID nhan vien muon xem bang cong: ");
-        fgets(inputId, 50, stdin);
-        inputId[strcspn(inputId, "\n")] = '\0';
-        index = IdExisted(inputId);
+        printf("\nNhap ID nhan vien muon xem bang cong: ");
+        fgets(InputId, 50, stdin);
+        InputId[strcspn(InputId, "\n")] = '\0';
+        
+        trimString(InputId);
+
+        // Validate rong
+        if (strcmp(InputId, "") == 0) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc de trong! Vui long nhap lai.\n");
+            setColor(0); 
+            continue;
+        }
+
+        // Validate ky tu dac biet
+        int isSpecial = 0;
+        for (int i = 0; i < strlen(InputId); i++) {
+            if (!isalnum(InputId[i])) { 
+                isSpecial = 1;
+                break;
+            }
+        }
+        if (isSpecial) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc chua ky tu dac biet!\n");
+            setColor(0); 
+            continue;
+        }
+
+        // Kiem tra ton tai
+        index = IdExisted(InputId);
         if (index == -1) {
-        	clearScreen();
-            printf("\nKhong tim thay nhan vien. Vui long nhap lai.\n");
+            loadingBar(50, 31);
+            setColor(31);
+            printf("\nKhong tim thay nhan vien co ma [%s]. Vui long nhap lai.\n", InputId);
+            setColor(0); 
         }
     } while (index == -1);
+
+    loadingBar(50, 34); 
     
-    printf("\n");
-    loadingBar(50,33);
-    printf("============================================\n");
+    printf("\n============================================\n");
     printf("          BANG CHAM CONG CA NHAN           \n");
     printf("============================================\n");
     printf(" Ma NV     : %s\n", listEmployee[index].empId);
     printf(" Ho va Ten : %s\n", listEmployee[index].name);
     printf(" Chuc vu   : %s\n", listEmployee[index].position);
     printf("============================================\n");
-
     printf("| %-20s | %-15s |\n", "NGAY THANG", "TRANG THAI");
     printf("|----------------------|-----------------|\n");
 
-    int count = 0; 
+    int countWork = 0; 
+    int countLeave = 0; 
     int foundLog = 0;
 
     for (int i = 0; i < logCount; i++) {
-        if (strcmp(listTimeSheet[i].empId, inputId) == 0) {
-            
+        if (strcmp(listTimeSheet[i].empId, InputId) == 0) {
             printf("| %-20s | %-15s |\n", 
                    listTimeSheet[i].date,    
                    listTimeSheet[i].status); 
             
-            count++;
+            if (strcmp(listTimeSheet[i].status, "Di lam") == 0) {
+                countWork++;
+            } else {
+                countLeave++;
+            }
             foundLog = 1;
         }
     }
@@ -720,11 +892,15 @@ void ViewPersonalTimeSheet() {
     }
 
     printf("--------------------------------------------\n");
-    
-    printf(" TONG SO NGAY ÐA CHAM CONG: %d ngay\n", count);
+    printf(" TONG SO NGAY DI LAM: %d ngay\n", countWork);
+    if (countLeave > 0) {
+        printf(" TONG SO NGAY NGHI  : %d ngay\n", countLeave);
+    }
     printf("============================================\n");
-    
-    getchar();
+
+    setColor(32);
+    printf("\n[Thong bao] Hien thi du lieu thanh cong!\n");
+    setColor(0);
 }
 
 void loadingBar(int length, int color) {
@@ -736,7 +912,6 @@ void loadingBar(int length, int color) {
 
         printf("\r[");  // quay ve dau dong
 
-        // Phan dã tai (có màu)
         setColor(color);
         for (int j = 0; j < i; j++) printf("=");
         
