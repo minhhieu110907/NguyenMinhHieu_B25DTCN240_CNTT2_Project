@@ -195,6 +195,21 @@ void employeeList_display (){
         listEmployee[i].workDay);
 	}
 	printf("+----+------------+----------------------+---------------+------------+----------+\n");
+} 
+
+void trimString(char str[]) {
+    int start = 0, end = strlen(str) - 1;
+    while (isspace(str[start])) start++;
+    if (str[start] == '\0') {
+        str[0] = '\0';
+        return;
+    }
+    while (end > start && isspace(str[end])) end--;
+    int i;
+    for (i = 0; i <= end - start; i++) {
+        str[i] = str[start + i];
+    }
+    str[i] = '\0';
 }
 
 void add_employee(){
@@ -210,6 +225,7 @@ void add_employee(){
 		printf("Nhap ma nhan vien: ");
 		fgets(e.empId,50,stdin);
 		e.empId[strcspn(e.empId,"\n")]='\0';
+		trimString(e.empId);
 		
 		if (strcmp (e.empId,"") == 0){
 			setColor(31);
