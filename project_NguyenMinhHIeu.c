@@ -2,6 +2,8 @@
 #include<string.h>
 #include<stdlib.h>
 #include<time.h>
+#include<ctype.h>
+#include<windows.h>
 #define MAX 1000
 
 typedef struct {
@@ -222,21 +224,41 @@ void add_employee(){
 		return;
 	}
 	do {
-		printf("Nhap ma nhan vien: ");
-		fgets(e.empId,50,stdin);
-		e.empId[strcspn(e.empId,"\n")]='\0';
-		trimString(e.empId);
-		
-		if (strcmp (e.empId,"") == 0){
-			setColor(31);
-			printf("Ma nhan vien khong duoc de trong\n");
-		}
-		if ( IdExisted(e.empId) != -1){
-			setColor(31);
-			printf("Ma nhan vien da ton tai trong danh sach\n");
-		}
-	} while ( strcmp (e.empId,"") == 0 || IdExisted(e.empId) != -1 );
-	
+        printf("Nhap ma nhan vien: ");
+        fgets(e.empId, 50, stdin);
+        e.empId[strcspn(e.empId, "\n")] = '\0';
+        
+        trimString(e.empId);
+        
+        if (strcmp(e.empId, "") == 0) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc de trong\n");
+            continue; 
+        }
+        
+        int isSpecial = 0;
+        for (int i = 0; i < strlen(e.empId); i++) {
+            if (!isalnum(e.empId[i])) { // N?u phát hi?n ký t? KHÔNG ph?i ch?/s?
+                isSpecial = 1;
+                break;
+            }
+        }
+        
+        if (isSpecial) {
+            setColor(31);
+            printf("Ma nhan vien khong duoc chua ky tu dac biet hoac khoang trang o giua!\n");
+            continue;
+        }
+
+        if (IdExisted(e.empId) != -1) {
+            setColor(31);
+            printf("Ma nhan vien da ton tai\n");
+            continue;
+        }
+        
+        break;
+
+    } while (1);
 	do {
 		printf("Nhap ten nhan vien: ");
 		fgets(e.name,50,stdin);
@@ -327,9 +349,9 @@ void add_employee(){
             continue;
         }
 
-        if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0) {
+        if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0 || e.workDay >31 ) {
         	setColor(31);
-            printf("Ngay cong phai la so nguyen duong!\n");
+            printf("Ngay cong phai la so nguyen duong va nho hon 32!\n");
             continue;
         }
 
@@ -414,9 +436,9 @@ void employee_update(){
             continue;
         }
 
-        if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0) {
+        if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0 || e.workDay > 31) {
         	setColor(31);
-            printf("Ngay cong phai la so nguyen duong!\n");
+            printf("Ngay cong phai la so nguyen duong va nho hon 32!\n");
             continue;
         }
 
@@ -665,8 +687,8 @@ void ViewPersonalTimeSheet() {
         }
     } while (index == -1);
     
-    clearScreen();
     printf("\n");
+    loadingBar(50,33);
     printf("============================================\n");
     printf("          BANG CHAM CONG CA NHAN           \n");
     printf("============================================\n");
@@ -702,7 +724,6 @@ void ViewPersonalTimeSheet() {
     printf(" TONG SO NGAY ÐA CHAM CONG: %d ngay\n", count);
     printf("============================================\n");
     
-    printf("\nNhan Enter de quay lai...");
     getchar();
 }
 
@@ -738,7 +759,7 @@ void clearScreen() {
     for (int i = 0; i < 3; i++) {
         printf(".");
         fflush(stdout);
-        usleep(400000);
+        Sleep(400);
     }
     printf("\033[2J\033[1;1H");
 }
