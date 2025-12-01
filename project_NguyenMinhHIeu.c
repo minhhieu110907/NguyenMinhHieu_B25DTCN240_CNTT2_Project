@@ -136,7 +136,7 @@ void addSampleList() {
     listEmployee[n++] = e3;
     listEmployee[n++] = e4;
 
-    // 2. Tu dong tao du lieu Cham cong (Mix giua Di lam va Nghi lam)
+    // 2. Tu dong tao du lieu Cham cong 
     for (int i = 0; i < n; i++) {
         // Giai doan 1: Tao ngay DI LAM (dua theo workDay cua tung nguoi)
         for (int j = 1; j <= listEmployee[i].workDay; j++) {
@@ -975,6 +975,7 @@ void setColor(int color) {
     printf("\033[1;%dm", color);
 }
 	
+
 
 
 
