@@ -42,15 +42,28 @@ int n = 0;
 Employee listEmployee[MAX];
 TimeSheet listTimeSheet[MAX * 30];
 int logCount = 0;
+char inputBuffer[50];
 int main(){
 	int choose;
 	addSampleList();
 	do {
 		system("cls");
 		menu_display();
-		printf("Moi ban nhap vao lua chon: ");
-		scanf("%d",&choose);
-		getchar();
+        printf("Moi ban nhap vao lua chon: ");
+        fgets(inputBuffer, sizeof(inputBuffer), stdin);
+        inputBuffer[strcspn(inputBuffer, "\n")] = '\0';
+        trimString(inputBuffer);
+
+        if (strlen(inputBuffer) == 0) {
+            printf("\n=> Loi: Khong duoc de trong! Enter de nhap lai...");
+            getchar(); continue;
+        }
+        char checkChar; 
+        if (sscanf(inputBuffer, "%d%c", &choose, &checkChar) != 1) {
+            // Neu sscanf khong doc duoc 1 so duy nhat (Vi du nhap "abc" hoac "12a")
+            printf("\n=> Loi: Lua chon phai la so nguyen! Enter de nhap lai...");
+            getchar(); continue;
+        }
 		
 		switch(choose){
 			case 1: {
