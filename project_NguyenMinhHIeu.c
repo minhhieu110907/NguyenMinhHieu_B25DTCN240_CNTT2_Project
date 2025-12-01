@@ -164,7 +164,7 @@ void menu_display(){
     printf("|8. Xem bang cong                                          |\n");
     printf("|9. Thoat                                                  |\n");
     printf("+----------------------------------------------------------+\n");
-    printf("\033[0m"); // Reset color
+    setColor(0); // Reset color
 }
 
 int IdExisted(char empId[]){
@@ -975,6 +975,7 @@ void setColor(int color) {
     printf("\033[1;%dm", color);
 }
 	
+
 
 
 
