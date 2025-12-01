@@ -1,3 +1,4 @@
+
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -248,6 +249,7 @@ void add_employee(){
         if (strcmp(e.empId, "") == 0) {
             setColor(31);
             printf("Ma nhan vien khong duoc de trong\n");
+            setColor(0);
             continue; 
         }
         
@@ -261,11 +263,13 @@ void add_employee(){
         if (isSpecial) {
             setColor(31);
             printf("Ma nhan vien khong duoc chua ky tu dac biet hoac khoang trang o giua!\n");
+            setColor(0);
             continue;
         }
         if (IdExisted(e.empId) != -1) {
             setColor(31);
             printf("Ma nhan vien da ton tai\n");
+            setColor(0);
             continue;
         }
         
@@ -279,6 +283,7 @@ void add_employee(){
 		if (strcmp (e.name,"") == 0 ){
 			setColor(31);
 			printf("Ten nhan vien khong duoc de trong\n");
+			setColor(0);
 		}
 	} while ( strcmp (e.name,"") == 0 );
 	
@@ -290,6 +295,7 @@ void add_employee(){
 		if (strcmp (e.position,"") == 0 ){
 			setColor(31);
 			printf("Chuc vu nhan vien khong duoc de trong\n");
+			setColor(0);
 		}
 	} while ( strcmp (e.position,"") == 0 );
 	
@@ -306,6 +312,7 @@ void add_employee(){
     if (strlen(salaryinput) == 0) {
     	setColor(31);
         printf("Khong duoc de trong! Vui long nhap lai.\n");
+        setColor(0);
         continue;
     }
 
@@ -313,6 +320,7 @@ void add_employee(){
     if (sscanf(salaryinput, "%lf", &baseSalary) != 1) {
     	setColor(31);
         printf("Luong phai la so! Vui long nhap lai.\n");
+        setColor(0);
         continue;
     }
 
@@ -320,6 +328,7 @@ void add_employee(){
     if (baseSalary <= 0) {
     	setColor(31);
         printf("Luong phai la so duong! Vui long nhap lai.\n");
+        setColor(0);
         continue;
     }
     break; 
@@ -334,6 +343,7 @@ void add_employee(){
     if (strlen(salaryinput) == 0) {
     	setColor(31);
         printf("Khong duoc de trong! Vui long nhap lai.\n");
+        setColor(0);
         continue;
     }
 
@@ -358,12 +368,14 @@ void add_employee(){
         if (strlen(buf) == 0) {
         	setColor(31);
             printf("Khong duoc de trong!\n");
+            setColor(0);
             continue;
         }
 
         if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0 || e.workDay >31 ) {
         	setColor(31);
             printf("Ngay cong phai la so nguyen duong va nho hon 32!\n");
+            setColor(0);
             continue;
         }
 
@@ -394,6 +406,7 @@ void employee_update(){
         if (strcmp(targetId, "") == 0) {
             setColor(31);
             printf("Ma nhan vien khong duoc de trong\n");
+            setColor(0);
             continue; 
         }
         
@@ -408,6 +421,7 @@ void employee_update(){
         if (isSpecial) {
             setColor(31);
             printf("Ma nhan vien khong duoc chua ky tu dac biet!\n");
+            setColor(0);
             continue;
         }
         
@@ -417,6 +431,7 @@ void employee_update(){
             loadingBar(50, 32);
             setColor(31);
             printf("\nKhong tim thay nhan vien co ma [%s]. Vui long nhap lai.\n", targetId);
+            setColor(0);
             continue; 
         }
         break; 
@@ -448,6 +463,7 @@ void employee_update(){
     if (sscanf(salaryinput, "%lf", &baseSalary) != 1) {
     	setColor(31);
         printf("\nLuong phai la so! Vui long nhap lai.\n");
+        setColor(0);
         continue;
     }
 
@@ -455,6 +471,7 @@ void employee_update(){
     if (baseSalary <= 0) {
     	setColor(31);
         printf("\nLuong phai la so duong! Vui long nhap lai.\n");
+        setColor(0);
         continue;
     }
     break; 
@@ -470,12 +487,14 @@ void employee_update(){
         if (strlen(buf) == 0) {
         	setColor(31);
             printf("Khong duoc de trong!\n");
+            setColor(0);
             continue;
         }
 
         if (sscanf(buf, "%d", &e.workDay) != 1 || e.workDay <= 0 || e.workDay > 31) {
         	setColor(31);
             printf("Ngay cong phai la so nguyen duong va nho hon 32!\n");
+            setColor(0);
             continue;
         }
 
@@ -502,6 +521,7 @@ void delete_employee(){
         if (strcmp(deleteId, "") == 0) {
             setColor(31);
             printf("Ma nhan vien khong duoc de trong\n");
+            setColor(0);
             continue; 
         }
         
@@ -515,6 +535,7 @@ void delete_employee(){
         if (isSpecial) {
             setColor(31);
             printf("Ma nhan vien khong duoc chua ky tu dac biet hoac khoang trang o giua!\n");
+            setColor(0);
             continue;
         }
         index = IdExisted(deleteId);
@@ -575,6 +596,7 @@ void search_by_name(){
 	if (found == 0 ){
 		setColor(31);
 		printf("\nKhong tim thay nhan vien!");
+		setColor(0);
 	}
 }
 
@@ -593,6 +615,7 @@ void sort_by_baseSalary(){
 		if ( choice != 1 && choice != 2){
 			setColor(31);
 			printf("\nLua chon khong hop le.");
+			setColor(0);
 		}
 	} while ( choice != 1 && choice != 2);
 	if ( choice == 1){
@@ -632,10 +655,12 @@ int getDaysInMonth(int m, int y) {
 int validateDate(int day, int month, int year){
     // 1. Kiem tra thang nam co ban
     if (month < 1 || month > 12) {
-        setColor(31); printf("\nThang khong hop le!"); return 0;
+        setColor(31); printf("\nThang khong hop le!"); 
+		return 0;
     }
     if (year < 1900 || year > 2100) {
-        setColor(31); printf("\nNam khong hop le"); return 0;
+        setColor(31); printf("\nNam khong hop le"); 
+		return 0;
     }
 
     // 2. Goi ham getDaysInMonth de lay so ngay toi da cua thang do
@@ -643,7 +668,9 @@ int validateDate(int day, int month, int year){
 
     // 3. So sanh
     if (day < 1 || day > maxDay) {
-        setColor(31); printf("\nNgay khong hop le (Thang %d chi co %d ngay)!", month, maxDay);
+        setColor(31); 
+		printf("\nNgay khong hop le (Thang %d chi co %d ngay)!", month, maxDay);
+        setColor(0);
         return 0;
     }
     
@@ -733,15 +760,22 @@ void timeKeeping() {
     printf("Nhan vien: %s - %s\n", listEmployee[index].empId, listEmployee[index].name);
 
     int d, m, y;
+    char dateInput[100]; // 1. Khai bao them bien luu chuoi nhap ngay
+
     do {
         printf("Moi nhap ngay cham cong (dd/mm/yyyy): ");
-        if (scanf("%d/%d/%d", &d, &m, &y) != 3) {
+        fgets(dateInput, sizeof(dateInput), stdin);
+        dateInput[strcspn(dateInput, "\n")] = '\0';
+        
+        trimString(dateInput); 
+
+        if (sscanf(dateInput, "%d/%d/%d", &d, &m, &y) != 3) {
             loadingBar(50, 31);
-		    printf("\n Sai dinh dang. Moi ban nhap lai.\n");
-        while(getchar() != '\n');
-			continue;
+            printf("\n Sai dinh dang. Moi ban nhap lai.\n");
+            setColor(0);
+            continue;
         }
-        getchar(); 
+        
     } while (validateDate(d, m, y) == 0);
 
     if (isFutureDate(d, m, y)) {
