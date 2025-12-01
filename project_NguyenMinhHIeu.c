@@ -60,7 +60,6 @@ int main(){
         }
         char checkChar; 
         if (sscanf(inputBuffer, "%d%c", &choose, &checkChar) != 1) {
-            // Neu sscanf khong doc duoc 1 so duy nhat (Vi du nhap "abc" hoac "12a")
             printf("\n=> Loi: Lua chon phai la so nguyen! Enter de nhap lai...");
             getchar(); continue;
         }
@@ -177,57 +176,99 @@ int IdExisted(char empId[]){
 	return -1;
 }
 
-void employeeList_display (){
-	if ( n == 0){
-		setColor(31);
-		printf("Khong co nhan vien nao\n");
-		return;
-	}
-    int perPage = 2;  
-    int totalPage = (n + perPage - 1) / perPage;
-    int page;
-
-    printf("Danh sach co %d trang.\n", totalPage);
-
-    while (1) {
-        printf("Nhap trang muon xem (1 - %d): ", totalPage);
-        if (scanf("%d", &page) != 1) {
-        	setColor(31);
-            printf("Dinh dang khong hop le. Vui long nhap 1 so nguyen.\n"); 
-            while (getchar() != '\n');
-            continue;
-        }
-        while (getchar() != '\n'); 
-
-        if (page < 1 || page > totalPage) {
-        	setColor(31);
-            printf("So trang khong hop le! Vui long nhap lai.\n");
-            continue;
-        }
-        break; 
+void employeeList_display() {
+    // 1. Kiem tra danh sach rong
+    if (n == 0) {
+        setColor(31);
+        printf("\nDanh sach trong! Khong co gi de hien thi.\n");
+        setColor(0);
+        return;
     }
 
-    // Tinh vi tri bat dau – ket thúc
-    int start = (page - 1) * perPage;
-    int end = start + perPage;
-    if (end > n) end = n;
+    int perPage = 2; // So nhan vien tren 1 trang
+    int totalPage = (n + perPage - 1) / perPage;
+    int currentPage = 1; 
+    int action;
+    
+    char navBuffer[50]; 
 
-    printf("\n=== TRANG %d / %d ===\n", page, totalPage);
-	printf("\n-----Danh sach nhan vien-----\n");
-	printf("+----+------------+----------------------+---------------+------------+----------+\n");
-    printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
-    printf("+----+------------+----------------------+---------------+------------+----------+\n");
-    for (int i = start; i < end; i++) {
-    printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
-        i + 1,
-        listEmployee[i].empId,
-        listEmployee[i].name,
-        listEmployee[i].position,
-        listEmployee[i].baseSalary,
-        listEmployee[i].workDay);
-	}
-	printf("+----+------------+----------------------+---------------+------------+----------+\n");
-} 
+    do {
+        system("cls"); 
+
+        // Tinh toan vi tri
+        int start = (currentPage - 1) * perPage;
+        int end = start + perPage;
+        if (end > n) end = n;
+
+        printf("\n=== DANH SACH NHAN VIEN (Trang %d / %d) ===\n", currentPage, totalPage);
+        printf("+----+------------+----------------------+---------------+------------+----------+\n");
+        printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
+        printf("+----+------------+----------------------+---------------+------------+----------+\n");
+        
+        for (int i = start; i < end; i++) {
+            printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
+                i + 1,
+                listEmployee[i].empId,
+                listEmployee[i].name,
+                listEmployee[i].position,
+                listEmployee[i].baseSalary,
+                listEmployee[i].workDay);
+        }
+        printf("+----+------------+----------------------+---------------+------------+----------+\n");
+
+        // Menu Dieu Huong
+        printf("\n[Dieu huong]: ");
+        if (currentPage < totalPage) printf(" [1] Trang sau  ");
+        if (currentPage > 1)         printf(" [2] Trang truoc  ");
+        printf(" [3] Den trang cu the  [0] Thoat ra Menu");
+        
+        printf("\nLua chon cua ban: ");
+        fgets(navBuffer, sizeof(navBuffer), stdin);
+        
+        if (sscanf(navBuffer, "%d", &action) != 1) {
+            action = -1; 
+        }
+
+        switch(action) {
+            case 1: // Trang sau
+                if (currentPage < totalPage) {
+                    currentPage++;
+                } else {
+                    printf("\n=> Day la trang cuoi cung roi!\n"); Sleep(800);
+                }
+                break;
+
+            case 2: // Trang truoc
+                if (currentPage > 1) {
+                    currentPage--;
+                } else {
+                    printf("\n=> Day la trang dau tien roi!\n"); Sleep(800);
+                }
+                break;
+
+            case 3: // Nhay trang
+                printf("Nhap so trang muon den (1-%d): ", totalPage);
+                int targetPage;
+                // Tai su dung navBuffer de nhap so trang luon
+                fgets(navBuffer, sizeof(navBuffer), stdin);
+                if (sscanf(navBuffer, "%d", &targetPage) == 1) {
+                    if (targetPage >= 1 && targetPage <= totalPage) {
+                        currentPage = targetPage;
+                    } else {
+                        setColor(31); printf("=> So trang khong hop le!\n"); setColor(0); Sleep(1000);
+                    }
+                }
+                break;
+
+            case 0: // Thoat
+                return; 
+
+            default:
+                printf("\nLua chon khong hop le!\n"); Sleep(500);
+        }
+
+    } while (1);
+}
 
 void trimString(char str[]) {
     int start = 0, end = strlen(str) - 1;
